@@ -106,8 +106,7 @@ namespace PruebaTec02FJCO_.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
+         
                 if (imagen != null && imagen.Length > 0)
                 {
                     using (var memoryStream = new MemoryStream())
@@ -120,16 +119,17 @@ namespace PruebaTec02FJCO_.Controllers
                 }
                 else
                 {
-                    var producFind = await _context.Empleados.FirstOrDefaultAsync(s => s.Id ==empleado.Id);
+                    var producFind = await _context.Empleados.FirstOrDefaultAsync(s => s.Id == empleado.Id);
                     if (producFind?.Imagen?.Length > 0)
-                    empleado.Imagen = producFind.Imagen;
-                    producFind.Nombre =empleado.Nombre;
-                    producFind.Apellido =empleado.Apellido;
+                        empleado.Imagen = producFind.Imagen;
+                    producFind.Nombre = empleado.Nombre;
+                    producFind.Apellido = empleado.Apellido;
                     producFind.Salario =empleado.Salario;
-                    producFind.DepartamentoId =empleado.DepartamentoId;
+                    producFind.DepartamentoId = empleado.DepartamentoId;
                     _context.Update(producFind);
                     await _context.SaveChangesAsync();
                 }
+
                 try
                 {
                    
@@ -146,9 +146,7 @@ namespace PruebaTec02FJCO_.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
-            }
-            ViewData["DepartamentoId"] = new SelectList(_context.Departamentos, "Id", "Id", empleado.DepartamentoId);
-            return View(empleado);
+          
         }
 
         // GET: Empleado/Delete/5
