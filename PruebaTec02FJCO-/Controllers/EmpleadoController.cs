@@ -47,7 +47,7 @@ namespace PruebaTec02FJCO_.Controllers
         // GET: Empleado/Create
         public IActionResult Create()
         {
-            ViewData["DepartamentoId"] = new SelectList(_context.Departamentos, "Id", "Id");
+            ViewData["DepartamentoId"] = new SelectList(_context.Departamentos, "Nombre", "Nombre");
             return View();
         }
 
@@ -56,10 +56,19 @@ namespace PruebaTec02FJCO_.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Imagen,Salario,DepartamentoId")] Empleado empleado)
+        public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Salario,DepartamentoId")] Empleado empleado, IFormFile imagen)
         {
             if (ModelState.IsValid)
             {
+                if (imagen != null && imagen.Length > 0)
+                {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await imagen.CopyToAsync(memoryStream);
+                        empleado.Imagen = memoryStream.ToArray();
+                    }
+                }
+
                 _context.Add(empleado);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -90,7 +99,7 @@ namespace PruebaTec02FJCO_.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Imagen,Salario,DepartamentoId")] Empleado empleado)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nombre,Apellido,Salario,DepartamentoId")] Empleado empleado, IFormFile imagen)
         {
             if (id != empleado.Id)
             {
@@ -99,10 +108,31 @@ namespace PruebaTec02FJCO_.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (imagen != null && imagen.Length > 0)
                 {
+                    using (var memoryStream = new MemoryStream())
+                    {
+                        await imagen.CopyToAsync(memoryStream);
+                        empleado.Imagen = memoryStream.ToArray();
+                    }
                     _context.Update(empleado);
                     await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    var producFind = await _context.Empleados.FirstOrDefaultAsync(s => s.Id ==empleado.Id);
+                    if (producFind?.Imagen?.Length > 0)
+                    empleado.Imagen = producFind.Imagen;
+                    producFind.Nombre =empleado.Nombre;
+                    producFind.Apellido =empleado.Apellido;
+                    producFind.Salario =empleado.Salario;
+                    producFind.DepartamentoId =empleado.DepartamentoId;
+                    _context.Update(producFind);
+                    await _context.SaveChangesAsync();
+                }
+                try
+                {
+                   
                 }
                 catch (DbUpdateConcurrencyException)
                 {
