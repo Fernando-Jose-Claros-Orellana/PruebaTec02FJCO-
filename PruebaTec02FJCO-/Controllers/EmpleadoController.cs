@@ -90,7 +90,7 @@ namespace PruebaTec02FJCO_.Controllers
             {
                 return NotFound();
             }
-            ViewData["DepartamentoId"] = new SelectList(_context.Departamentos, "Id", "Id", empleado.DepartamentoId);
+            ViewData["DepartamentoId"] = new SelectList(_context.Departamentos, "Nombre", "Nombre", empleado.DepartamentoId);
             return View(empleado);
         }
 
